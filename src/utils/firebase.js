@@ -1,4 +1,4 @@
-import { initializeApp, } from "firebase/app";
+/*import { initializeApp, } from "firebase/app";
 import firestore from '@react-native-firebase/firestore';
 
 
@@ -25,4 +25,4 @@ const firebaseConfig = {
 
 const firebase = initializeApp(firebaseConfig);
 
-export const user = await firestore().collection('users').doc('6IsXLQa3IUEIwpcCcpJn').get();
+export const user = await firestore().collection('users').doc('6IsXLQa3IUEIwpcCcpJn').get();*/
