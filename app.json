@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ScooterSharing",
-    "slug": "ScooterSharing",
+    "name": "scootersharing",
+    "slug": "scootersharing",
     "version": "1.0.0",
     "assetBundlePatterns": [
       "**/*"
     ]
   },
-  "name": "ScooterSharing"
+  "name": "scootersharing"
 }
