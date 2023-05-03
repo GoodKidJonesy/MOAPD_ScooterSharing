@@ -10,7 +10,7 @@ import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { getAdress } from "../utils/Geolocator";
 import ScooterPopUp from "./ScooterPopUp";
-import { PopUpContext } from "../Contexts/PopUpContext";
+import { PopUpContext } from "../contexts/PopUpContext";
 
 const width = Dimensions.get("screen").width;
 const height = Dimensions.get("screen").height;

@@ -1,19 +1,26 @@
-import React, { useEffect } from "react";
-import MapComponent from "./src/Components/MapComponent";
-import NavBar from "./src/Components/NavBar";
+import React, { useState } from "react";
+import {
+  getScooters,
+  addUser,
+  scooterRegistered,
+  getHistoryOfUser,
+  getUnreservedScootersIds,
+  getUserHistory,
+  getUser,
+} from "./src/utils/Firebase";
+import UserScreen from "./src/screens/UserScreen";
+import LoginScreen from "./src/screens/LoginScreen";
 import { View } from "react-native";
-import { getScooters, addUser, scooterRegistered, getHistoryOfUser, getUnreservedScootersIds, getRentUserHistory } from "./src/utils/Firebase";
+import { UserContext } from "./src/contexts/UserContext";
 
 export default function App() {
-  useEffect(() => {
-    getRentUserHistory(123);
-    // getUnreservedScootersIds()
-  })
+  const [user, setUser] = useState(null);
   
   return (
-    <View className="w-full h-full bg-black">
-      <MapComponent />
-      <NavBar />
+    <View>
+      <UserContext.Provider value={{ user, setUser }}>
+        {user !== null ? <UserScreen /> : <LoginScreen />}
+      </UserContext.Provider>
     </View>
   );
 }
