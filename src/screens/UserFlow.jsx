@@ -1,7 +1,7 @@
 import React, { useContext, useState } from "react";
 import { View } from "react-native";
-import MapComponent from "../components/MapComponent";
-import NavBar from "../components/NavBar";
+import MapComponent from "../Components/MapComponent";
+import NavBar from "../Components/NavBar";
 
 export default function UserFlow() {
   return (

@@ -1,11 +1,11 @@
 import React, { useContext, useEffect, useState } from "react";
 import { Pressable } from "react-native";
 import { View, Text, Image } from "react-native";
-import { PopUpContext } from "../contexts/PopUpContext";
+import { PopUpContext } from "../Contexts/PopUpContext";
 import DesignIcon from "react-native-vector-icons/AntDesign";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import { getAdress } from "../utils/Geolocator";
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "../Contexts/UserContext";
 import { startRide, endRide } from "../utils/Firebase";
 import { getUser } from "../utils/Firebase";
 

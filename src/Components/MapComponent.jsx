@@ -3,10 +3,10 @@ import { Dimensions, View, Text } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { getAdress } from "../utils/Geolocator";
-import ScooterPopUp from "./ScooterPopUp";
-import { PopUpContext } from "../contexts/PopUpContext";
+import ScooterPopUp from "./ScooterPopup";
+import { PopUpContext } from "../Contexts/PopUpContext";
 import { getUnreservedScooters, getScooter } from "../utils/Firebase";
-import { UserContext } from "../contexts/UserContext";
+import { UserContext } from "../Contexts/UserContext";
 
 const width = Dimensions.get("screen").width;
 const height = Dimensions.get("screen").height;
