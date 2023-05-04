@@ -7,7 +7,7 @@ import { SignOutContext } from "../contexts/SignOutContext";
 export default function NavBar() {
   const [showSignOutPage, setShowSignOutPage] = useState(false);
   return (
-    <View className = "absolute top-0 w-full h-full">
+    <View className = {showSignOutPage ? "absolute top-0 w-full h-full" : "absolute bottom-0 w-full h-16"}>
     <SignOutContext.Provider value={{showSignOutPage, setShowSignOutPage}}>
         <SignOut/>
       </SignOutContext.Provider>

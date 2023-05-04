@@ -6,13 +6,16 @@ import DesignIcon from "react-native-vector-icons/AntDesign";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import { getAdress } from "../utils/Geolocator";
 import { UserContext } from "../contexts/UserContext";
-import { startRide, endRide } from "../utils/Firebase";
+import { ScannerContext } from "../contexts/ScannerContext";
+import { endRide } from "../utils/Firebase";
 import { getUser } from "../utils/Firebase";
+import BarCodeScannerComponent from "./BarCodeScannerComponent";
 
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
   const [address, setAddress] = useState("");
   const { user, setUser } = useContext(UserContext);
+  const [showScanner, setShowScanner] = useState(false);
 
   useEffect(() => {
     getAdress(scooter.coordinates).then((res) => setAddress(res));
@@ -35,69 +38,79 @@ export default function ScooterPopUp({ scooter }) {
 
   function handleClick(user, scooter) {
     if (user.currentScooter === 0) {
-      startRide(user, scooter).then((x) => {
-        getUser(user).then((res) => {
-          setUser(res);
-        });
-      });
+      setShowScanner(true);
     } else {
       endRide(user, scooter).then((x) => {
         getUser(user).then((res) => {
+          res.currentScooter = 0;
           setUser(res);
         });
       });
+      setShowPopUp(false);
+      alert("Ride Ended!");
     }
   }
 
   return showPopUp ? (
-    <View className="absolute -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 bg-white transform rounded-xl p-4">
-      <View className="h-full w-full flex">
-        <Pressable
-          pressRetentionOffset={100}
-          onPress={() => {
-            setShowPopUp(false);
-          }}
-        >
-          <DesignIcon name="close" size={14} />
-        </Pressable>
-
-        <View className="flex items-center pt-2">
-          <Text className="text-xl">{scooter.name}</Text>
-        </View>
-
-        <View className="flex justify-between flex-row pt-2">
-          <View className="flex flex-row items-center">
-            <Text className="pl-1 text-md">{`${scooter.battery}%`}</Text>
-            <AwesomeIcon className=" text-md" name={battery} />
-          </View>
-          <View className="flex flex-row items-center">
-            <AwesomeIcon className=" text-md" name="money" />
-            <Text className="pl-1 text-md">{"5 DKK"}</Text>
-          </View>
-        </View>
-
-        <View className="flex-1 mt-2 mb-2 w-full flex items-center">
-          <Image
-            className="h-24 w-24"
-            source={{
-              uri: scooter.image,
-            }}
-          />
-        </View>
-
-        <View className="w-full flex items-center">
+    <View
+      className={
+        showScanner
+          ? "absolute transform -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 rounded-xl p-4 bg-black"
+          : "absolute transform -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 rounded-xl p-4 bg-white"
+      }
+    >
+      <ScannerContext.Provider value={{ showScanner, setShowScanner }}>
+        <BarCodeScannerComponent scooter={scooter} />
+      </ScannerContext.Provider>
+      {!showScanner && (
+        <View className="h-full w-full flex">
           <Pressable
+            pressRetentionOffset={100}
             onPress={() => {
-              handleClick(user, scooter);
+              setShowPopUp(false);
             }}
-            className="border-black border-2 rounded-lg p-1"
           >
-            <Text className={"text-lg"}>
-              {user.currentScooter === 0 ? "Start Ride!" : "End Ride!"}
-            </Text>
+            <DesignIcon name="close" size={14} />
           </Pressable>
+
+          <View className="flex items-center pt-2">
+            <Text className="text-xl">{`scooter ${scooter.ID}`}</Text>
+          </View>
+
+          <View className="flex justify-between flex-row pt-2">
+            <View className="flex flex-row items-center">
+              <Text className="pl-1 text-md">{`${scooter.battery}%`}</Text>
+              <AwesomeIcon className=" text-md" name={battery} />
+            </View>
+            <View className="flex flex-row items-center">
+              <AwesomeIcon className=" text-md" name="money" />
+              <Text className="pl-1 text-md">{"5 DKK"}</Text>
+            </View>
+          </View>
+
+          <View className="flex-1 mt-2 mb-2 w-full flex items-center">
+            <Image
+              className="h-24 w-24"
+              source={{
+                uri: scooter.image,
+              }}
+            />
+          </View>
+
+          <View className="w-full flex items-center">
+            <Pressable
+              onPress={() => {
+                handleClick(user, scooter);
+              }}
+              className="border-black border-2 rounded-lg p-1"
+            >
+              <Text className={"text-lg"}>
+                {user.currentScooter === 0 ? "Start Ride!" : "End Ride!"}
+              </Text>
+            </Pressable>
+          </View>
         </View>
-      </View>
+      )}
     </View>
   ) : null;
 }
