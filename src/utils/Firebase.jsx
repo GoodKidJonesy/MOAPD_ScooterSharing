@@ -13,10 +13,6 @@ import {
   QuerySnapshot,
   updateDoc,
 } from "firebase/firestore";
-import { ref, set } from "firebase/database";
-
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -29,16 +25,6 @@ const firebaseConfig = {
   messagingSenderId: "173872272122",
   appId: "1:173872272122:web:fb92f71a7078c3272d2f43",
 };
-
-// const firebaseConfig = {
-//     apiKey: FIREBASE_APIKEY,
-//     authDomain: FIREBASE_AUTHDOMAIN,
-//     databaseURL: FIREBASE_DATABASE_URL,
-//     projectId: FIREBASE_PROJECTID,
-//     storageBucket: FIREBASE_STORAGEBUCKET,
-//     messagingSenderId: FIREBASE_MESSAING_SENDER_ID,
-//     appId: FIREBASE_APPID
-// };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
