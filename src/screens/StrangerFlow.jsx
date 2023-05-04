@@ -3,7 +3,7 @@ import { View, Text, Pressable, TextInput } from "react-native";
 import { checkUserLogin, GenerateUser } from "../utils/Firebase";
 import { UserContext } from "../contexts/UserContext";
 
-export default function LoginScreen() {
+export default function LoginFlow() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loginPage, setLoginPage] = useState(true);

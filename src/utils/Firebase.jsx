@@ -11,6 +11,7 @@ import {
   where,
   onSnapshot,
   QuerySnapshot,
+  updateDoc,
 } from "firebase/firestore";
 import { ref, set } from "firebase/database";
 
@@ -45,8 +46,8 @@ const db = getFirestore(app);
 
 // query
 
-// gets the ids of the unreserved scooters
-export const getUnreservedScootersIds = async () => {
+// return list of unreserved scooters
+export const getUnreservedScooters = async () => {
   const getUnReservedScooters = query(
     collection(db, "scooters"),
     where("isReserved", "==", false)
@@ -60,10 +61,11 @@ export const getUnreservedScootersIds = async () => {
   return unReservedScootersArr;
 };
 
-export const getUserHistory = async (userName) => {
+//return list of user rides
+export const getUserHistory = async (user) => {
   const getHistoryQuery = query(
     collection(db, "historyOfUser"),
-    where("userID", "==", userName)
+    where("userID", "==", user.ID)
   );
   const historySnapshot = await getDocs(getHistoryQuery);
   const userHistoryArr = [];
@@ -73,6 +75,7 @@ export const getUserHistory = async (userName) => {
   return userHistoryArr;
 };
 
+//If login is valid return user object else return null
 export const checkUserLogin = async (email, password) => {
   const userQuery = query(
     collection(db, "users"),
@@ -87,6 +90,7 @@ export const checkUserLogin = async (email, password) => {
   return userArr.length > 0 ? userArr[0] : null;
 };
 
+//Check if email is already found in database
 export const checkUserExistance = async (email) => {
   const userQuery = query(collection(db, "users"), where("email", "==", email));
   const userSnapshot = await getDocs(userQuery);
@@ -97,21 +101,21 @@ export const checkUserExistance = async (email) => {
   return userArr.length > 0 ? true : false;
 };
 
-export const GenerateUser = async (email, password) => {
-  const exists = await checkUserExistance(email);
-  if (exists) {
-    return false;
-  } else {
-    addDoc(collection(db, "users"), {
-      email: email,
-      password: password,
-    });
-    return true;
-  }
+//Check if scooter is reserved
+export const isScooterReserved = async (scooter) => {
+  const scooterQuery = query(
+    collection(db, "scooters"),
+    where("ID", "==", scooter.ID)
+  );
+  const scooterSnapshot = await getDocs(scooterQuery);
+  let response;
+  scooterSnapshot.forEach((docs) => {
+    response = docs.data();
+  });
+  return response.isReserved ? true : false;
 };
 
-// fetch from db
-
+//List of all scooters
 export const getScooters = async () => {
   const scooterSnapshot = await getDocs(collection(db, "scooters"));
   const scootersArr = [];
@@ -121,34 +125,83 @@ export const getScooters = async () => {
   return scootersArr;
 };
 
-export const getUser = async (user) => {
-  const userDocument = await getDoc(doc(db, "users", user));
-  return userDocument.data();
-};
-
-export const getHistoryOfUser = async (userName) => {
-  const historySnapshot = await getDocs(collection(db, "historyOfUser"));
-  historySnapshot.forEach((doc) => {
-    console.log(doc.data());
+//Reserve a scooter
+const reserveScooter = async (docsID) => {
+  updateDoc(doc(db, "scooters", docsID), {
+    isReserved: true,
   });
 };
 
-//inserts to db
-
-export const addScooterToHistory = async (scooterName, userName) => {
-  const docRef = await addDoc(collection(db, "historyOfUser"), {
-    scooterName: scooterName,
-    userName: userName,
-    date: Date().toString(),
+//Release a scooter
+const releaseScooter = async (docsID) => {
+  updateDoc(doc(db, "scooters", docsID), {
+    isReserved: false,
   });
 };
 
-export const addUser = async (username, password, email) => {
-  const docRef = await addDoc(collection(db, "users"), {
-    username: username,
-    password: password,
-    email: email,
-  });
+//Start a ride
+export const startRide = async (user, scooter) => {
+  isReserved = await isScooterReserved(scooter);
+  if (isReserved) {
+    return false;
+  } else {
+    addDoc(collection(db, "historyOfUser"), {
+      scooterID: scooter.ID,
+      userID: user.ID,
+      startTime: Date(),
+      endTime: null,
+    });
+    const scooterSnapshot = await getDocs(collection(db, "scooters"));
+    scooterSnapshot.forEach((docs) => {
+      if (docs.data().ID === scooter.ID) {
+        reserveScooter(docs.id);
+      }
+    });
+    return true;
+  }
 };
 
-//update
+//End a ride
+export const endRide = async (user, scooter) => {
+  isReserved = await isScooterReserved(scooter);
+
+  if (isReserved) {
+    console.log("not reserved");
+    return false;
+  } else {
+    const scooterSnapshot = await getDocs(collection(db, "scooters"));
+    const historySnapshot = await getDocs(collection(db, "historyOfUser"));
+
+    historySnapshot.forEach((docs) => {
+      if (
+        docs.data().endTime === null &&
+        docs.data().userID === user.ID &&
+        docs.data().scooterID === scooter.ID
+      ) {
+        scooterSnapshot.forEach((docs) => {
+          if (docs.data().ID === scooter.ID) {
+            releaseScooter(docs.id);
+          }
+        });
+        updateDoc(doc(db, "historyOfUser", docs.id), {
+          endTime: Date(),
+        });
+      }
+    });
+  }
+};
+
+//Generate a user in databse
+export const GenerateUser = async (email, password) => {
+  const exists = await checkUserExistance(email);
+  if (exists) {
+    return false;
+  } else {
+    addDoc(collection(db, "users"), {
+      email: email,
+      password: password,
+      ID: 1,
+    });
+    return true;
+  }
+};

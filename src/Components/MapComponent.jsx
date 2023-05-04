@@ -11,6 +11,7 @@ import * as Location from "expo-location";
 import { getAdress } from "../utils/Geolocator";
 import ScooterPopUp from "./ScooterPopUp";
 import { PopUpContext } from "../contexts/PopUpContext";
+import { getUnreservedScooters } from "../utils/Firebase";
 
 const width = Dimensions.get("screen").width;
 const height = Dimensions.get("screen").height;
@@ -18,51 +19,13 @@ const ASPECT_RATIO = width / height;
 const LATITUDE_DELTA = 0.02;
 const LONGITUDE_DELTA = LATITUDE_DELTA * ASPECT_RATIO;
 
-const scooters = [
-  {
-    coordinates: {
-      latitude: 55.659957,
-      longitude: 12.334714,
-    },
-    name: "Scooter1",
-    battery: 100,
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/scootersharing-24093.appspot.com/o/1547202571.png?alt=media&token=1301d1e9-6d18-46ae-9519-b557c4bff77d",
-  },
-  {
-    coordinates: {
-      latitude: 55.662,
-      longitude: 12.339298,
-    },
-    name: "Scooter2",
-    battery: 76,
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/scootersharing-24093.appspot.com/o/1547202571.png?alt=media&token=1301d1e9-6d18-46ae-9519-b557c4bff77d",
-  },
-  {
-    coordinates: {
-      latitude: 55.65911,
-      longitude: 12.339327,
-    },
-    name: "Scooter3",
-    battery: 30,
-    image:
-      "https://firebasestorage.googleapis.com/v0/b/scootersharing-24093.appspot.com/o/1547202571.png?alt=media&token=1301d1e9-6d18-46ae-9519-b557c4bff77d",
-  },
-];
-
 export default function MapComponent() {
   const [trackingStatus, setTrackingStatus] = useState("");
   const [mapRegion, setMapRegion] = useState(null);
   const mapViewRef = useRef();
   const [showPopUp, setShowPopUp] = useState(false);
-  const [currentScooter, setCurrentScooter] = useState({
-    coordinates: { latitude: 0, longitude: 0 },
-    name: "placeholder",
-    battery: 0,
-    image: "",
-  });
-  const [address, setAddress] = useState("");
+  const [currentScooter, setCurrentScooter] = useState(null);
+  const [availableScooters, setAvailableScooters] = useState([]);
   const moveSpeed = 200;
 
   function moveMap(lat, long) {
@@ -98,6 +61,10 @@ export default function MapComponent() {
         initMap();
       }
     })();
+
+    getUnreservedScooters().then((res) => {
+      setAvailableScooters(res);
+    });
   }, []);
 
   return (
@@ -123,11 +90,15 @@ export default function MapComponent() {
               setShowPopUp(false);
             }}
           >
-            {scooters.map((scooter, index) => (
+            {availableScooters.map((scooter) => (
               <Marker
-                key={index}
-                coordinate={scooter.coordinates}
+                key={scooter.ID}
+                coordinate={{
+                  latitude: scooter.coordinates.latitude,
+                  longitude: scooter.coordinates.longitude,
+                }}
                 stopPropagation={true}
+                tracksViewChanges={false}
                 onPress={() => {
                   setShowPopUp(false);
                   moveMap(
@@ -139,12 +110,11 @@ export default function MapComponent() {
                     setShowPopUp(true);
                   }, moveSpeed);
                 }}
-                tracksViewChanges={false}
               />
             ))}
           </MapView>
         )}
-        <ScooterPopUp scooter={currentScooter} />
+        {currentScooter && <ScooterPopUp scooter={currentScooter} />}
       </View>
     </PopUpContext.Provider>
   );

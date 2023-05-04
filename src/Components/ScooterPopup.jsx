@@ -5,10 +5,13 @@ import { PopUpContext } from "../contexts/PopUpContext";
 import DesignIcon from "react-native-vector-icons/AntDesign";
 import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import { getAdress } from "../utils/Geolocator";
+import { UserContext } from "../contexts/UserContext";
+import { startRide, endRide } from "../utils/Firebase";
 
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
   const [address, setAddress] = useState("");
+  const { user, setUser } = useContext(UserContext);
 
   useEffect(() => {
     getAdress(scooter.coordinates).then((res) => setAddress(res));
@@ -69,11 +72,12 @@ export default function ScooterPopUp({ scooter }) {
         <View className="w-full flex items-center">
           <Pressable
             onPress={() => {
-              //TODO: handle starting a ride
+              startRide(user, scooter);
+              endRide(user, scooter);
             }}
             className="border-black border-2 rounded-lg p-1"
           >
-            <Text className="text-lg">Start Ride!</Text>
+            <Text className={"text-lg"}>Start Ride!</Text>
           </Pressable>
         </View>
       </View>
