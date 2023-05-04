@@ -66,7 +66,7 @@ export default function ScooterPopUp({ scooter }) {
         </Pressable>
 
         <View className="flex items-center pt-2">
-          <Text className="text-xl">{scooter.name}</Text>
+          <Text className="text-xl">{`scooter ${scooter.ID}`}</Text>
         </View>
 
         <View className="flex justify-between flex-row pt-2">

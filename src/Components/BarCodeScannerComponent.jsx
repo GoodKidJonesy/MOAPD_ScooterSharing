@@ -18,7 +18,7 @@ export default function BarCodeScannerComponent({ scooter }) {
       const { status } = await BarCodeScanner.requestPermissionsAsync();
       setHasPermission(status === "granted");
     })();
-  }, []);
+  }, [scooter]);
 
   const handleBarCodeScanned = ({ data }) => {
     setScanData(data);
