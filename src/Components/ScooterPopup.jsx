@@ -7,6 +7,7 @@ import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import { getAdress } from "../utils/Geolocator";
 import { UserContext } from "../contexts/UserContext";
 import { startRide, endRide } from "../utils/Firebase";
+import { getUser } from "../utils/Firebase";
 
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
@@ -30,8 +31,23 @@ export default function ScooterPopUp({ scooter }) {
       return "battery-empty";
     }
   }
-
   const battery = defineBattery(scooter.battery);
+
+  function handleClick(user, scooter) {
+    if (user.currentScooter === 0) {
+      startRide(user, scooter).then((x) => {
+        getUser(user).then((res) => {
+          setUser(res);
+        });
+      });
+    } else {
+      endRide(user, scooter).then((x) => {
+        getUser(user).then((res) => {
+          setUser(res);
+        });
+      });
+    }
+  }
 
   return showPopUp ? (
     <View className="absolute -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 bg-white transform rounded-xl p-4">
@@ -72,12 +88,13 @@ export default function ScooterPopUp({ scooter }) {
         <View className="w-full flex items-center">
           <Pressable
             onPress={() => {
-              startRide(user, scooter);
-              endRide(user, scooter);
+              handleClick(user, scooter);
             }}
             className="border-black border-2 rounded-lg p-1"
           >
-            <Text className={"text-lg"}>Start Ride!</Text>
+            <Text className={"text-lg"}>
+              {user.currentScooter === 0 ? "Start Ride!" : "End Ride!"}
+            </Text>
           </Pressable>
         </View>
       </View>

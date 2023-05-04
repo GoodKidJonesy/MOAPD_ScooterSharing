@@ -61,6 +61,17 @@ export const getUnreservedScooters = async () => {
   return unReservedScootersArr;
 };
 
+//Return user
+export const getUser = async (user) => {
+  const userQuery = query(collection(db, "users"), where("ID", "==", user.ID));
+  const userSnapshot = await getDocs(userQuery);
+  const userArr = [];
+  userSnapshot.forEach((docs) => {
+    userArr.push(docs.data());
+  });
+  return userArr[0];
+};
+
 //return list of user rides
 export const getUserHistory = async (user) => {
   const getHistoryQuery = query(
@@ -125,6 +136,20 @@ export const getScooters = async () => {
   return scootersArr;
 };
 
+//Get scooter from ID
+export const getScooter = async (scooterID) => {
+  const scooterQuery = query(
+    collection(db, "scooters"),
+    where("ID", "==", scooterID)
+  );
+  const scooterSnapshot = await getDocs(scooterQuery);
+  const scootersArr = [];
+  scooterSnapshot.forEach((doc) => {
+    scootersArr.push(doc.data());
+  });
+  return scootersArr;
+};
+
 //Reserve a scooter
 const reserveScooter = async (docsID) => {
   updateDoc(doc(db, "scooters", docsID), {
@@ -136,6 +161,13 @@ const reserveScooter = async (docsID) => {
 const releaseScooter = async (docsID) => {
   updateDoc(doc(db, "scooters", docsID), {
     isReserved: false,
+  });
+};
+
+//Set Current Scooter
+const setCurrentScooter = async (docsID, scooterID) => {
+  updateDoc(doc(db, "users", docsID), {
+    currentScooter: scooterID,
   });
 };
 
@@ -152,9 +184,15 @@ export const startRide = async (user, scooter) => {
       endTime: null,
     });
     const scooterSnapshot = await getDocs(collection(db, "scooters"));
+    const userSnapshot = await getDocs(collection(db, "users"));
     scooterSnapshot.forEach((docs) => {
       if (docs.data().ID === scooter.ID) {
         reserveScooter(docs.id);
+      }
+    });
+    userSnapshot.forEach((docs) => {
+      if (docs.data().ID === user.ID) {
+        setCurrentScooter(docs.id, scooter.ID);
       }
     });
     return true;
@@ -165,12 +203,13 @@ export const startRide = async (user, scooter) => {
 export const endRide = async (user, scooter) => {
   isReserved = await isScooterReserved(scooter);
 
-  if (isReserved) {
+  if (!isReserved) {
     console.log("not reserved");
     return false;
   } else {
     const scooterSnapshot = await getDocs(collection(db, "scooters"));
     const historySnapshot = await getDocs(collection(db, "historyOfUser"));
+    const userSnapshot = await getDocs(collection(db, "users"));
 
     historySnapshot.forEach((docs) => {
       if (
@@ -183,6 +222,11 @@ export const endRide = async (user, scooter) => {
             releaseScooter(docs.id);
           }
         });
+        userSnapshot.forEach((docs) => {
+          if (docs.data().ID === user.ID) {
+            setCurrentScooter(docs.id, 0);
+          }
+        });
         updateDoc(doc(db, "historyOfUser", docs.id), {
           endTime: Date(),
         });
@@ -191,7 +235,7 @@ export const endRide = async (user, scooter) => {
   }
 };
 
-//Generate a user in databse
+//Generate a user in database
 export const GenerateUser = async (email, password) => {
   const exists = await checkUserExistance(email);
   if (exists) {
@@ -201,6 +245,7 @@ export const GenerateUser = async (email, password) => {
       email: email,
       password: password,
       ID: 1,
+      currentScooter: 0,
     });
     return true;
   }

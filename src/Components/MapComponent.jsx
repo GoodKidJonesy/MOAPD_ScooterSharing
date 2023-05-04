@@ -1,17 +1,12 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useContext,
-  createContext,
-} from "react";
+import React, { useState, useEffect, useRef, useContext } from "react";
 import { Dimensions, View, Text } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
 import * as Location from "expo-location";
 import { getAdress } from "../utils/Geolocator";
 import ScooterPopUp from "./ScooterPopUp";
 import { PopUpContext } from "../contexts/PopUpContext";
-import { getUnreservedScooters } from "../utils/Firebase";
+import { getUnreservedScooters, getScooter } from "../utils/Firebase";
+import { UserContext } from "../contexts/UserContext";
 
 const width = Dimensions.get("screen").width;
 const height = Dimensions.get("screen").height;
@@ -26,6 +21,7 @@ export default function MapComponent() {
   const [showPopUp, setShowPopUp] = useState(false);
   const [currentScooter, setCurrentScooter] = useState(null);
   const [availableScooters, setAvailableScooters] = useState([]);
+  const { user, setUser } = useContext(UserContext);
   const moveSpeed = 200;
 
   function moveMap(lat, long) {
@@ -61,11 +57,19 @@ export default function MapComponent() {
         initMap();
       }
     })();
-
-    getUnreservedScooters().then((res) => {
-      setAvailableScooters(res);
-    });
   }, []);
+
+  useEffect(() => {
+    if (user.currentScooter === 0) {
+      getUnreservedScooters().then((res) => {
+        setAvailableScooters(res);
+      });
+    } else {
+      getScooter(user.currentScooter).then((res) => {
+        setAvailableScooters(res);
+      });
+    }
+  }, [user.currentScooter]);
 
   return (
     <PopUpContext.Provider value={{ showPopUp, setShowPopUp }}>
