@@ -2,7 +2,7 @@ import React, { useContext, useState } from "react";
 import { View, Pressable } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
 import SignOut from "./SignOut";
-import { SignOutContext } from "../Contexts/SignOutContext";
+import { SignOutContext } from "../contexts/SignOutContext";
 
 export default function NavBar() {
   const [showSignOutPage, setShowSignOutPage] = useState(false);

@@ -1,7 +1,7 @@
 import { View, Pressable, Text } from "react-native";
-import { SignOutContext } from "../Contexts/SignOutContext";
+import { SignOutContext } from "../contexts/SignOutContext";
 import React, { useContext, useState } from "react";
-import { UserContext } from "../Contexts/UserContext";
+import { UserContext } from "../contexts/UserContext";
 import DesignIcon from "react-native-vector-icons/AntDesign";
 
 export default function SignOut() {

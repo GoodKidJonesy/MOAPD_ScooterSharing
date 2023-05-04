@@ -1,7 +1,7 @@
 import React, { useState, useContext } from "react";
 import { View, Text, Pressable, TextInput } from "react-native";
 import { checkUserLogin, GenerateUser } from "../utils/Firebase";
-import { UserContext } from "../Contexts/UserContext";
+import { UserContext } from "../contexts/UserContext";
 
 export default function LoginFlow() {
   const [email, setEmail] = useState("");
