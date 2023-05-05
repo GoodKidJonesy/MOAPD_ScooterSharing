@@ -236,3 +236,11 @@ export const GenerateUser = async (email, password) => {
     return true;
   }
 };
+
+//Generate report in database
+export const GenerateReport = async (message, scooterID) => {
+  addDoc(collection(db, "reports"), {
+    message: message,
+    scooterID: scooterID
+  });
+}
