@@ -119,7 +119,6 @@ export default function MapComponent() {
                 stopPropagation={true}
                 tracksViewChanges={false}
                 onPress={() => {
-                  console.log();
                   setDestination(
                     scooter.coordinates.latitude +
                       "," +

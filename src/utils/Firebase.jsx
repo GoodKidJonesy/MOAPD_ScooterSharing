@@ -192,7 +192,6 @@ export const endRide = async (user, scooter) => {
   isReserved = await isScooterReserved(scooter);
 
   if (!isReserved) {
-    console.log("not reserved");
     return false;
   } else {
     const scooterSnapshot = await getDocs(collection(db, "scooters"));
@@ -262,7 +261,6 @@ export const updateScooterImage = async (scooterID, uri) => {
       resolve(xhr.response);
     };
     xhr.onerror = function (e) {
-      console.log(e);
       reject(new TypeError("Network request failed"));
     };
     xhr.responseType = "blob";

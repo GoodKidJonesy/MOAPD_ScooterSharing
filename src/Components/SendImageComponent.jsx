@@ -25,8 +25,6 @@ export default function SendImageComponent({ scooter }) {
       quality: 0,
     });
 
-    console.log(result);
-
     if (!result.canceled) {
       updateScooterImage(scooter.ID, result.assets[0].uri);
       endRide(user, scooter).then((x) => {
