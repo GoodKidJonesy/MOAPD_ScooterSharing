@@ -5,8 +5,10 @@ import { PopUpContext } from "../contexts/PopUpContext";
 import { getUser, endRide, updateScooterImage } from "../utils/Firebase";
 import { View, Text, Pressable } from "react-native";
 import { UserContext } from "../contexts/UserContext";
+import { LocationContext } from "../contexts/LocationContext";
 
 export default function SendImageComponent({ scooter }) {
+  const { userLocation, setUserLocation } = useContext(LocationContext);
   const [image, setImage] = useState(null);
   const { showImageComponent, setShowImageComponent } =
     useContext(SendImageContext);
@@ -27,7 +29,7 @@ export default function SendImageComponent({ scooter }) {
 
     if (!result.canceled) {
       updateScooterImage(scooter.ID, result.assets[0].uri);
-      endRide(user, scooter).then((x) => {
+      endRide(user, scooter, userLocation).then((x) => {
         getUser(user).then((res) => {
           res.currentScooter = 0;
           setUser(res);

@@ -1,11 +1,6 @@
 import React, { useContext, useState } from "react";
 import { ReportContext } from "../contexts/ReportContext";
-import {
-  getUser,
-  endRide,
-  updateScooterImage,
-  generateReport,
-} from "../utils/Firebase";
+import { generateReport } from "../utils/Firebase";
 import { View, Text, Pressable, TextInput } from "react-native";
 import { UserContext } from "../contexts/UserContext";
 

@@ -5,14 +5,12 @@ import {
   getFirestore,
   collection,
   addDoc,
-  getDoc,
   getDocs,
   doc,
   query,
   where,
-  onSnapshot,
-  QuerySnapshot,
   updateDoc,
+  GeoPoint,
 } from "firebase/firestore";
 
 // Your web app's Firebase configuration
@@ -146,9 +144,13 @@ const reserveScooter = async (docsID) => {
 };
 
 //Release a scooter
-const releaseScooter = async (docsID) => {
+const releaseScooter = async (docsID, newLocation) => {
   updateDoc(doc(db, "scooters", docsID), {
     isReserved: false,
+    coordinates: new GeoPoint(
+      newLocation.coords.latitude,
+      newLocation.coords.longitude
+    ),
   });
 };
 
@@ -188,7 +190,7 @@ export const startRide = async (user, scooter) => {
 };
 
 //End a ride
-export const endRide = async (user, scooter) => {
+export const endRide = async (user, scooter, newLocation) => {
   isReserved = await isScooterReserved(scooter);
 
   if (!isReserved) {
@@ -206,7 +208,7 @@ export const endRide = async (user, scooter) => {
       ) {
         scooterSnapshot.forEach((docs) => {
           if (docs.data().ID === scooter.ID) {
-            releaseScooter(docs.id);
+            releaseScooter(docs.id, newLocation);
           }
         });
         userSnapshot.forEach((docs) => {
@@ -239,10 +241,18 @@ export const GenerateUser = async (email, password) => {
   if (exists) {
     return false;
   } else {
+    const userSnapshot = await getDocs(collection(db, "users"));
+    const userArr = [];
+    userSnapshot.forEach((doc) => {
+      userArr.push(doc.data());
+    });
+
+    const newID = userArr.length + 1;
+
     addDoc(collection(db, "users"), {
       email: email,
       password: password,
-      ID: 1,
+      ID: newID,
       currentScooter: 0,
     });
     return true;

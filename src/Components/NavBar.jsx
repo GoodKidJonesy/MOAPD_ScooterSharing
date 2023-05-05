@@ -35,10 +35,6 @@ export default function NavBar() {
           <Icon name="list-ul" size={30} />
         </Pressable>
 
-        <Pressable onPress={() => {}}>
-          <Icon name="qrcode" size={30} />
-        </Pressable>
-
         <Pressable
           onPress={() => {
             setShowSignOutPage(showSignOutPage ? false : true);

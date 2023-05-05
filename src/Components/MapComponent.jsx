@@ -14,6 +14,7 @@ import { PopUpContext } from "../contexts/PopUpContext";
 import { getUnreservedScooters, getScooter } from "../utils/Firebase";
 import { UserContext } from "../contexts/UserContext";
 import { GOOGLE_MAPS_APIKEY } from "../utils/Google";
+import { LocationContext } from "../contexts/LocationContext";
 
 const width = Dimensions.get("screen").width;
 const height = Dimensions.get("screen").height;
@@ -30,8 +31,13 @@ export default function MapComponent() {
   const [availableScooters, setAvailableScooters] = useState([]);
   const { user, setUser } = useContext(UserContext);
   const moveSpeed = 200;
-  const [userLocation, setUserLocation] = useState("");
-  const [destination, setDestination] = useState("");
+  const [userLocation, setUserLocation] = useState({
+    coords: {
+      latitude: 0,
+      longitude: 0,
+    },
+  });
+  const [destination, setDestination] = useState();
 
   function moveMap(lat, long) {
     mapViewRef.current.animateToRegion(
@@ -87,67 +93,73 @@ export default function MapComponent() {
   }, [user.currentScooter]);
 
   return (
-    <PopUpContext.Provider value={{ showPopUp, setShowPopUp }}>
-      <View className="h-full w-full relative">
-        <View className="h-full w-full absolute bg-blue-500r flex items-center justify-center top-0 left-0">
-          <Text className="text-white text-3xl">
-            {trackingStatus === "granted" ? "Loading Map..." : trackingStatus}
-          </Text>
-        </View>
-        {mapRegion != null && (
-          <MapView
-            ref={mapViewRef}
-            className="h-full w-full"
-            mapPadding={{ top: 28, right: 0, left: 0, bottom: 0 }}
-            region={mapRegion}
-            provider={PROVIDER_GOOGLE}
-            showsUserLocation={true}
-            onPress={() => {
-              setShowPopUp(false);
-            }}
-            onPanDrag={() => {
-              setShowPopUp(false);
-            }}
-          >
-            {availableScooters.map((scooter) => (
-              <Marker
-                key={scooter.ID}
-                coordinate={{
-                  latitude: scooter.coordinates.latitude,
-                  longitude: scooter.coordinates.longitude,
-                }}
-                stopPropagation={true}
-                tracksViewChanges={false}
-                onPress={() => {
-                  setDestination(
-                    scooter.coordinates.latitude +
-                      "," +
+    <LocationContext.Provider value={{ userLocation, setUserLocation }}>
+      <PopUpContext.Provider value={{ showPopUp, setShowPopUp }}>
+        <View className="h-full w-full relative">
+          <View className="h-full w-full absolute bg-blue-500r flex items-center justify-center top-0 left-0">
+            <Text className="text-white text-3xl">
+              {trackingStatus === "granted" ? "Loading Map..." : trackingStatus}
+            </Text>
+          </View>
+          {mapRegion != null && (
+            <MapView
+              ref={mapViewRef}
+              className="h-full w-full"
+              mapPadding={{ top: 28, right: 0, left: 0, bottom: 0 }}
+              region={mapRegion}
+              provider={PROVIDER_GOOGLE}
+              showsUserLocation={true}
+              onPress={() => {
+                setShowPopUp(false);
+              }}
+              onPanDrag={() => {
+                setShowPopUp(false);
+              }}
+            >
+              {availableScooters.map((scooter) => (
+                <Marker
+                  key={scooter.ID}
+                  coordinate={{
+                    latitude: scooter.coordinates.latitude,
+                    longitude: scooter.coordinates.longitude,
+                  }}
+                  stopPropagation={true}
+                  tracksViewChanges={false}
+                  onPress={() => {
+                    setDestination(
+                      scooter.coordinates.latitude +
+                        "," +
+                        scooter.coordinates.longitude
+                    );
+                    setShowPopUp(false);
+                    moveMap(
+                      scooter.coordinates.latitude,
                       scooter.coordinates.longitude
-                  );
-                  setShowPopUp(false);
-                  moveMap(
-                    scooter.coordinates.latitude,
-                    scooter.coordinates.longitude
-                  );
-                  setCurrentScooter(scooter);
-                  setTimeout(() => {
-                    setShowPopUp(true);
-                  }, moveSpeed);
-                }}
+                    );
+                    setCurrentScooter(scooter);
+                    setTimeout(() => {
+                      setShowPopUp(true);
+                    }, moveSpeed);
+                  }}
+                />
+              ))}
+              <MapViewDirections
+                origin={
+                  userLocation.coords.latitude +
+                  "," +
+                  userLocation.coords.longitude
+                }
+                destination={destination}
+                apikey={GOOGLE_MAPS_APIKEY}
+                strokeColor="blue"
+                strokeWidth={3}
+                mode="WALKING"
               />
-            ))}
-            <MapViewDirections
-              origin={(userLocation.coords.latitude + "," + userLocation.coords.longitude)}
-              destination={destination}
-              apikey={GOOGLE_MAPS_APIKEY}
-              strokeColor="blue"
-              strokeWidth={3}
-              mode="WALKING"
-            />
-          </MapView>
-        )}
-        {currentScooter && <ScooterPopUp scooter={currentScooter} />}
-      </View>
-    </PopUpContext.Provider>
+            </MapView>
+          )}
+          {currentScooter && <ScooterPopUp scooter={currentScooter} />}
+        </View>
+      </PopUpContext.Provider>
+    </LocationContext.Provider>
   );
 }

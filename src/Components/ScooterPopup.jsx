@@ -17,7 +17,6 @@ import ReportComponent from "./ReportComponent";
 
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
-  const [address, setAddress] = useState("");
   const [scooterImage, setScooterImage] = useState(
     "https://cdn.discordapp.com/attachments/651377380367007767/1103830353896018010/troll.webp"
   );
@@ -27,7 +26,6 @@ export default function ScooterPopUp({ scooter }) {
   const [showReportComponent, setShowReportComponent] = useState(false);
 
   useEffect(() => {
-    getAdress(scooter.coordinates).then((res) => setAddress(res));
     getScooterImage(scooter).then((res) => setScooterImage(res));
   }, [scooter]);
 
