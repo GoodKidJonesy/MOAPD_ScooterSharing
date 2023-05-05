@@ -1,12 +1,19 @@
-import React, { useState, useEffect, useRef, useContext } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+  useLayoutEffect,
+} from "react";
 import { Dimensions, View, Text } from "react-native";
 import MapView, { PROVIDER_GOOGLE, Marker } from "react-native-maps";
+import MapViewDirections from "react-native-maps-directions";
 import * as Location from "expo-location";
-import { getAdress } from "../utils/Geolocator";
 import ScooterPopUp from "./ScooterPopup";
 import { PopUpContext } from "../contexts/PopUpContext";
 import { getUnreservedScooters, getScooter } from "../utils/Firebase";
 import { UserContext } from "../contexts/UserContext";
+import { GOOGLE_MAPS_APIKEY } from "../utils/Google";
 
 const width = Dimensions.get("screen").width;
 const height = Dimensions.get("screen").height;
@@ -23,6 +30,8 @@ export default function MapComponent() {
   const [availableScooters, setAvailableScooters] = useState([]);
   const { user, setUser } = useContext(UserContext);
   const moveSpeed = 200;
+  const [userLocation, setUserLocation] = useState("");
+  const [destination, setDestination] = useState("");
 
   function moveMap(lat, long) {
     mapViewRef.current.animateToRegion(
@@ -55,6 +64,12 @@ export default function MapComponent() {
       } else {
         setTrackingStatus(status);
         initMap();
+        await Location.watchPositionAsync(
+          {
+            distanceInterval: 0.5,
+          },
+          (res) => setUserLocation(res)
+        );
       }
     })();
   }, []);
@@ -104,6 +119,12 @@ export default function MapComponent() {
                 stopPropagation={true}
                 tracksViewChanges={false}
                 onPress={() => {
+                  console.log();
+                  setDestination(
+                    scooter.coordinates.latitude +
+                      "," +
+                      scooter.coordinates.longitude
+                  );
                   setShowPopUp(false);
                   moveMap(
                     scooter.coordinates.latitude,
@@ -116,6 +137,14 @@ export default function MapComponent() {
                 }}
               />
             ))}
+            <MapViewDirections
+              origin={(userLocation.coords.latitude + "," + userLocation.coords.longitude)}
+              destination={destination}
+              apikey={GOOGLE_MAPS_APIKEY}
+              strokeColor="blue"
+              strokeWidth={3}
+              mode="WALKING"
+            />
           </MapView>
         )}
         {currentScooter && <ScooterPopUp scooter={currentScooter} />}
