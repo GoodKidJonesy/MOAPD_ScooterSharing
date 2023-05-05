@@ -60,7 +60,7 @@ export default function BarCodeScannerComponent({ scooter }) {
   }
 
   return showScanner ? (
-    <View className="w-full h-full z-10 flex items-center">
+    <View className="w-full h-full z-10 flex items-center bg-black">
       <BarCodeScanner
         barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
         className="w-full h-full"

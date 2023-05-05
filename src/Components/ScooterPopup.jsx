@@ -55,7 +55,7 @@ export default function ScooterPopUp({ scooter }) {
     <View
       className={
         showScanner
-          ? "absolute top-0 left-0 w-full h-full"
+          ? "absolute top-0 left-0 w-full h-full bg-black"
           : "absolute transform -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 rounded-xl p-4 bg-white"
       }
     >
