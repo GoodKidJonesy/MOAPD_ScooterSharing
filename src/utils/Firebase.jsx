@@ -268,3 +268,10 @@ export const updateScooterImage = async (scooterID, uri) => {
 
   blob.close();
 };
+//Generate report in database
+export const GenerateReport = async (message, scooterID) => {
+  addDoc(collection(db, "reports"), {
+    message: message,
+    scooterID: scooterID
+  });
+}
