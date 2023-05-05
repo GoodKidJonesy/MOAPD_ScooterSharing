@@ -1,5 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
+import { getStorage, ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import {
   getFirestore,
   collection,
@@ -29,6 +30,7 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const storage = getStorage();
 
 // query
 
@@ -235,4 +237,34 @@ export const GenerateUser = async (email, password) => {
     });
     return true;
   }
+};
+
+export const getScooterImage = async (scooter) => {
+  const imageRef = ref(storage, `images/${scooter.ID}.png`);
+  return await getDownloadURL(imageRef);
+};
+
+export const updateScooterImage = async (scooterID, uri) => {
+  const blob = await new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    xhr.onload = function () {
+      resolve(xhr.response);
+    };
+    xhr.onerror = function (e) {
+      console.log(e);
+      reject(new TypeError("Network request failed"));
+    };
+    xhr.responseType = "blob";
+    xhr.open("GET", uri, true);
+    xhr.send(null);
+  });
+
+  try {
+    const imageRef = ref(storage, `images/${scooterID}.png`);
+    const result = await uploadBytes(imageRef, blob);
+  } catch (error) {
+    alert(error);
+  }
+
+  blob.close();
 };

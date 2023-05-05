@@ -60,16 +60,16 @@ export default function BarCodeScannerComponent({ scooter }) {
   }
 
   return showScanner ? (
-    <View className="absolute w-64 h-64 top-0 left-0 z-10 rounded-xl overflow-hidden flex items-center">
+    <View className="w-full h-full z-10 flex items-center">
       <BarCodeScanner
         barCodeTypes={[BarCodeScanner.Constants.BarCodeType.qr]}
         className="w-full h-full"
         onBarCodeScanned={scanData ? undefined : handleBarCodeScanned}
       />
-      <Text className="absolute text-white text-lg pt-2">
+      <Text className="absolute text-white text-lg mt-40">
         Please Scan The QR-Code
       </Text>
-      <View className="absolute border-2 border-white rounded-2xl w-40 h-40 top-1/2 left-1/2 transform -translate-x-20 -translate-y-20" />
+      <View className="absolute border-2 border-white rounded-2xl w-48 h-48 top-1/2 left-1/2 transform -translate-x-24 -translate-y-24" />
     </View>
   ) : null;
 }

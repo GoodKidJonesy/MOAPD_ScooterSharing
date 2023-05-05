@@ -7,18 +7,25 @@ import AwesomeIcon from "react-native-vector-icons/FontAwesome";
 import { getAdress } from "../utils/Geolocator";
 import { UserContext } from "../contexts/UserContext";
 import { ScannerContext } from "../contexts/ScannerContext";
-import { endRide } from "../utils/Firebase";
-import { getUser } from "../utils/Firebase";
+import { getScooterImage } from "../utils/Firebase";
+
 import BarCodeScannerComponent from "./BarCodeScannerComponent";
+import { SendImageContext } from "../contexts/SendImageContext";
+import SendImageComponent from "./SendImageComponent";
 
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
   const [address, setAddress] = useState("");
+  const [scooterImage, setScooterImage] = useState(
+    "https://cdn.discordapp.com/attachments/651377380367007767/1103830353896018010/troll.webp"
+  );
   const { user, setUser } = useContext(UserContext);
   const [showScanner, setShowScanner] = useState(false);
+  const [showImageComponent, setShowImageComponent] = useState();
 
   useEffect(() => {
     getAdress(scooter.coordinates).then((res) => setAddress(res));
+    getScooterImage(scooter).then((res) => setScooterImage(res));
   }, [scooter]);
 
   function defineBattery(battery) {
@@ -36,18 +43,11 @@ export default function ScooterPopUp({ scooter }) {
   }
   const battery = defineBattery(scooter.battery);
 
-  function handleClick(user, scooter) {
+  function handleClick() {
     if (user.currentScooter === 0) {
       setShowScanner(true);
     } else {
-      endRide(user, scooter).then((x) => {
-        getUser(user).then((res) => {
-          res.currentScooter = 0;
-          setUser(res);
-        });
-      });
-      setShowPopUp(false);
-      alert("Ride Ended!");
+      setShowImageComponent(true);
     }
   }
 
@@ -55,13 +55,18 @@ export default function ScooterPopUp({ scooter }) {
     <View
       className={
         showScanner
-          ? "absolute transform -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 rounded-xl p-4 bg-black"
+          ? "absolute top-0 left-0 w-full h-full"
           : "absolute transform -translate-x-32 -translate-y-72 top-1/2 left-1/2 w-64 h-64 rounded-xl p-4 bg-white"
       }
     >
       <ScannerContext.Provider value={{ showScanner, setShowScanner }}>
         <BarCodeScannerComponent scooter={scooter} />
       </ScannerContext.Provider>
+      <SendImageContext.Provider
+        value={{ showImageComponent, setShowImageComponent }}
+      >
+        <SendImageComponent scooter={scooter} />
+      </SendImageContext.Provider>
       {!showScanner && (
         <View className="h-full w-full flex">
           <Pressable
@@ -92,7 +97,7 @@ export default function ScooterPopUp({ scooter }) {
             <Image
               className="h-24 w-24"
               source={{
-                uri: scooter.image,
+                uri: scooterImage,
               }}
             />
           </View>
