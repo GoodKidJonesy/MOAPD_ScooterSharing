@@ -222,12 +222,12 @@ export const endRide = async (user, scooter) => {
         const diffInSeconds =
           (timeEnded.getTime() - timeStarted.getTime()) / 1000;
 
-        const price = (diffInSeconds * (5 / 60)).toFixed(2);
+        const price = diffInSeconds * (5 / 60);
 
         updateDoc(doc(db, "historyOfUser", docs.id), {
           endTime: Date(),
-          timeSpentInSeconds: diffInSeconds,
-          pricePaid: price,
+          timeSpentInSeconds: diffInSeconds.toFixed(0),
+          pricePaid: price.toFixed(2),
         });
       }
     });

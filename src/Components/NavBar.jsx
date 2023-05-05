@@ -29,6 +29,7 @@ export default function NavBar() {
         <Pressable
           onPress={() => {
             setShowHistoryOfUserPage(showHistoryOfUserPage ? false : true);
+            setShowSignOutPage(false);
           }}
         >
           <Icon name="list-ul" size={30} />
@@ -41,6 +42,7 @@ export default function NavBar() {
         <Pressable
           onPress={() => {
             setShowSignOutPage(showSignOutPage ? false : true);
+            setShowHistoryOfUserPage(false);
           }}
         >
           <Icon name="user-circle-o" size={30} />
