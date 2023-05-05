@@ -12,6 +12,8 @@ import { getScooterImage } from "../utils/Firebase";
 import BarCodeScannerComponent from "./BarCodeScannerComponent";
 import { SendImageContext } from "../contexts/SendImageContext";
 import SendImageComponent from "./SendImageComponent";
+import { ReportContext } from "../contexts/ReportContext";
+import ReportComponent from "./ReportComponent";
 
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
@@ -21,7 +23,8 @@ export default function ScooterPopUp({ scooter }) {
   );
   const { user, setUser } = useContext(UserContext);
   const [showScanner, setShowScanner] = useState(false);
-  const [showImageComponent, setShowImageComponent] = useState();
+  const [showImageComponent, setShowImageComponent] = useState(false);
+  const [showReportComponent, setShowReportComponent] = useState(false);
 
   useEffect(() => {
     getAdress(scooter.coordinates).then((res) => setAddress(res));
@@ -51,6 +54,10 @@ export default function ScooterPopUp({ scooter }) {
     }
   }
 
+  function handleReportClick() {
+    setShowReportComponent(true);
+  }
+
   return showPopUp ? (
     <View
       className={
@@ -67,16 +74,31 @@ export default function ScooterPopUp({ scooter }) {
       >
         <SendImageComponent scooter={scooter} />
       </SendImageContext.Provider>
+      <ReportContext.Provider
+        value={{ showReportComponent, setShowReportComponent }}
+      >
+        <ReportComponent scooter={scooter} />
+      </ReportContext.Provider>
       {!showScanner && (
         <View className="h-full w-full flex">
-          <Pressable
-            pressRetentionOffset={100}
-            onPress={() => {
-              setShowPopUp(false);
-            }}
-          >
-            <DesignIcon name="close" size={14} />
-          </Pressable>
+          <View className="w-full flex flex-row justify-between">
+            <Pressable
+              pressRetentionOffset={100}
+              onPress={() => {
+                setShowPopUp(false);
+              }}
+            >
+              <DesignIcon name="close" size={14} />
+            </Pressable>
+            <Pressable
+              pressRetentionOffset={100}
+              onPress={() => {
+                setShowReportComponent(true);
+              }}
+            >
+              <Text className="underline">Report</Text>
+            </Pressable>
+          </View>
 
           <View className="flex items-center pt-2">
             <Text className="text-xl">{`scooter ${scooter.ID}`}</Text>
@@ -107,9 +129,9 @@ export default function ScooterPopUp({ scooter }) {
               onPress={() => {
                 handleClick(user, scooter);
               }}
-              className="border-black border-2 rounded-lg p-1"
+              className="border-black border-2 rounded-lg pt-1 pb-1 pr-4 pl-4"
             >
-              <Text className={"text-lg"}>
+              <Text className={"text-md"}>
                 {user.currentScooter === 0 ? "Start Ride!" : "End Ride!"}
               </Text>
             </Pressable>
