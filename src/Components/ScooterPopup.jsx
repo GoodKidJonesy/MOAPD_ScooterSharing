@@ -18,7 +18,7 @@ import ReportComponent from "./ReportComponent";
 export default function ScooterPopUp({ scooter }) {
   const { showPopUp, setShowPopUp } = useContext(PopUpContext);
   const [scooterImage, setScooterImage] = useState(
-    "https://cdn.discordapp.com/attachments/651377380367007767/1103830353896018010/troll.webp"
+    "https://media.discordapp.net/attachments/651377380367007767/1103881884926218311/image.png"
   );
   const { user, setUser } = useContext(UserContext);
   const [showScanner, setShowScanner] = useState(false);
