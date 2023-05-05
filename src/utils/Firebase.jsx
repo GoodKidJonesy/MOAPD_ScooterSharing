@@ -215,8 +215,19 @@ export const endRide = async (user, scooter) => {
             setCurrentScooter(docs.id, 0);
           }
         });
+
+        const timeStarted = new Date(docs.data().startTime);
+        const timeEnded = new Date();
+
+        const diffInSeconds =
+          (timeEnded.getTime() - timeStarted.getTime()) / 1000;
+
+        const price = (diffInSeconds * (5 / 60)).toFixed(2);
+
         updateDoc(doc(db, "historyOfUser", docs.id), {
           endTime: Date(),
+          timeSpentInSeconds: diffInSeconds,
+          pricePaid: price,
         });
       }
     });
@@ -268,10 +279,11 @@ export const updateScooterImage = async (scooterID, uri) => {
 
   blob.close();
 };
+
 //Generate report in database
 export const GenerateReport = async (message, scooterID) => {
   addDoc(collection(db, "reports"), {
     message: message,
-    scooterID: scooterID
+    scooterID: scooterID,
   });
-}
+};
